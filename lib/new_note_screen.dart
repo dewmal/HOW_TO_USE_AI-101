@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:use_ai_to_detect_offensive_words/data/Note.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:use_ai_to_detect_offensive_words/tokenizer.dart';
+import 'package:sqlcool/sqlcool.dart';
 
 class NewNoteScreen extends StatefulWidget {
+  final Db db;
+
+  const NewNoteScreen({Key key, this.db}) : super(key: key);
   @override
   _NewNoteScreenState createState() => _NewNoteScreenState();
 }
@@ -59,10 +63,17 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
               padding: const EdgeInsets.all(8.0),
               child: FlatButton(
                   onPressed: () async {
-                    String name = noteNameEditCtrl.text;
-                    String text = noteTextEditCtrl.text;
-                    print("Name $name, Text $text");
-                    var note = Note(null, name, text, false);
+                    String nameVal = noteNameEditCtrl.text;
+                    String textVal = noteTextEditCtrl.text;
+                    double status = await _getPredictData(textVal);
+                    print("Name $nameVal, Text $textVal");
+                    final Map<String, String> row = {
+                      "name": nameVal,
+                      "text": textVal,
+                      "status": "$status"
+                    };
+                    await this.widget.db.insert(table: "note", row: row);
+                    Navigator.pop(context);
                   },
                   color: Colors.blue,
                   child: Padding(
@@ -82,7 +93,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     );
   }
 
-  Future<bool> _getPredictData(String text) async {
+  Future<double> _getPredictData(String text) async {
     var inputs = await tokenizer.getTokenized(text);
     var output = List<double>(1).reshape([1, 1]);
     final interpreter = await Interpreter.fromAsset('offsensive_model.tflite');
@@ -91,7 +102,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     print("Rate ${output[0][0]}");
 
     var result = "1";
-    if (output[0][0] > 0.6) {
+    if (output[0][0] < 0.5) {
       result = "1";
     } else {
       result = "0";
@@ -102,6 +113,6 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
       } else
         isOffensiveText = true;
     });
-    return isOffensiveText;
+    return output[0][0];
   }
 }
