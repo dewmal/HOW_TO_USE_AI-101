@@ -45,7 +45,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                     String name = noteNameEditCtrl.text;
                     String text = noteTextEditCtrl.text;
                     print("Name $name, Text $text");
-                    var note = Note(name, text);
+                    var note = Note(null, name, text, false);
                   },
                   color: Colors.blue,
                   child: Padding(
