@@ -102,16 +102,16 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     print("Rate ${output[0][0]}");
 
     var result = "1";
-    if (output[0][0] < 0.5) {
+    if (output[0][0] > 0.5) {
       result = "1";
     } else {
       result = "0";
     }
     setState(() {
       if (result == "1") {
-        isOffensiveText = false;
-      } else
         isOffensiveText = true;
+      } else
+        isOffensiveText = false;
     });
     return output[0][0];
   }
