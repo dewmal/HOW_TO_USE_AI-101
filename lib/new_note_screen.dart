@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:use_ai_to_detect_offensive_words/data/Note.dart';
 
 class NewNoteScreen extends StatefulWidget {
   @override
@@ -7,6 +8,8 @@ class NewNoteScreen extends StatefulWidget {
 
 class _NewNoteScreenState extends State<NewNoteScreen> {
   Color textFieldColor = Colors.black;
+  TextEditingController noteTextEditCtrl = TextEditingController();
+  TextEditingController noteNameEditCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,20 +24,39 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: noteNameEditCtrl,
+                style: TextStyle(color: Colors.blue, fontSize: 18),
+                decoration: InputDecoration(border: OutlineInputBorder()),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: noteTextEditCtrl,
                 style: TextStyle(color: textFieldColor, fontSize: 18),
-                maxLines: 12,
+                maxLines: 8,
                 decoration: InputDecoration(border: OutlineInputBorder()),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FlatButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    String name = noteNameEditCtrl.text;
+                    String text = noteTextEditCtrl.text;
+                    print("Name $name, Text $text");
+                    var note = Note(name, text);
+                  },
                   color: Colors.blue,
-                  child: Text(
-                    "Save",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w600),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Save",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18),
+                    ),
                   )),
             )
           ],
