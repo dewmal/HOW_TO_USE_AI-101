@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:use_ai_to_detect_offensive_words/new_note_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -59,7 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewNoteScreen()),
+          );
+        },
         tooltip: 'Increment',
         child: Icon(Icons.note_add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
