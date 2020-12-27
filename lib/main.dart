@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:use_ai_to_detect_offensive_words/new_note_screen.dart';
 import 'package:sqlcool/sqlcool.dart';
@@ -7,8 +9,7 @@ Db db = Db();
 DbTable note = DbTable("note")
   ..varchar("name", unique: true)
   ..text("text", nullable: false)
-  ..real("status", defaultValue: 1)
-  ..index("name");
+  ..real("status", defaultValue: 1);
 List<DbTable> schema = [note];
 
 void main() {
@@ -48,6 +49,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  StreamController<Map<String, dynamic>> notesCtrl = StreamController();
+
+  StreamController<List<Map<String, dynamic>>> notesList = StreamController();
+
+  @override
+  void initState() {
+    // noteCtrl.li
+    this.notesCtrl.stream.listen((row) async {
+      await db.insert(table: "note", row: row);
+      var dataList = await getNoteList();
+      notesList.add(dataList);
+    }, onDone: () {});
+
+    getNoteList().then((value) => notesList.add(value));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Padding(
         padding: EdgeInsets.all(8.0),
         child: StreamBuilder<List<Map<String, dynamic>>>(
-            stream: getNoteList(),
+            stream: notesList.stream,
             builder: (context, snapshot) {
               if (snapshot.error != null || snapshot.data == null)
                 return Container(
@@ -116,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(
                 builder: (context) => NewNoteScreen(
-                      db: db,
+                      noteCtrl: notesCtrl,
                     )),
           );
         },
@@ -126,12 +143,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getNoteList() async* {
+  Future<List<Map<String, dynamic>>> getNoteList() async {
     var data = await db.select(
       table: "note",
       limit: 20,
       columns: "name,text,status",
     );
-    yield data;
+    return data;
   }
 }

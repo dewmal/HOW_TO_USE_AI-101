@@ -1,13 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:use_ai_to_detect_offensive_words/data/Note.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:use_ai_to_detect_offensive_words/tokenizer.dart';
-import 'package:sqlcool/sqlcool.dart';
 
 class NewNoteScreen extends StatefulWidget {
-  final Db db;
+  final StreamController<Map<String, dynamic>> noteCtrl;
 
-  const NewNoteScreen({Key key, this.db}) : super(key: key);
+  const NewNoteScreen({Key key, this.noteCtrl}) : super(key: key);
   @override
   _NewNoteScreenState createState() => _NewNoteScreenState();
 }
@@ -72,7 +72,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                       "text": textVal,
                       "status": "$status"
                     };
-                    await this.widget.db.insert(table: "note", row: row);
+                    this.widget.noteCtrl.add(row);
                     Navigator.pop(context);
                   },
                   color: Colors.blue,
